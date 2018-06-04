@@ -37,12 +37,12 @@ post '/callback' do
                                 end
                                 if User.find(1).paid_total > User.find(2).paid_total
                                     total = User.find(1).paid_total - User.find(2).paid_total
-                                    response_message << User.find(1).name + 'が' + total.to_s + '円多く払っていました。'
+                                    response_message << "\n" + User.find(1).name + 'が' + total.to_s + '円多く払っていました。'
                                 elsif User.find(1).paid_total < User.find(2).paid_total
                                     total = User.find(2).paid_total - User.find(1).paid_total
-                                    response_message << User.find(2).name + 'が' + total.to_s + '円多く払っていました。'
+                                    response_message << "\n" + User.find(2).name + 'が' + total.to_s + '円多く払っていました。'
                                 else 
-                                    response_message << 'ピタリ賞！清算はありません！'
+                                    response_message << "\nピタリ賞！清算はありません！"
                                 end
                             elsif event.message['text'] == '清算終了'
                                 if User.find(1).paid_total > User.find(2).paid_total

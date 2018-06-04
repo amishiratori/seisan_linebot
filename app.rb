@@ -117,9 +117,9 @@ post '/list' do
                         user = User.find_by(name: user_name)
                         unless user.nil?
                             if message.include?('買う')
-                                message = message.delete('買う')
                                 message = message.delete(' ')
                                 message = message.delete('　')
+                                message = message.slice!(0, 2)
                                 new =List.create({
                                     group: '買い物',
                                     content: message
@@ -128,20 +128,20 @@ post '/list' do
                                     response_message = "買い物\n"
                                     List.all.each do |list|
                                         if list.group == '買い物'
-                                            response_message << list.content + "\n"
+                                            response_message << '・' + list.content + "\n"
                                         end
                                     end
                                     response_message << "\nTODO\n"
                                     List.all.each do |list|
                                         if list.group == 'TODO'
-                                            response_message << list.content + "\n"
+                                            response_message << '・' + list.content + "\n"
                                         end
                                     end
                                 end
                             elsif message.include?('タスク')
-                                message = message.delete('タスク')
                                 message = message.delete(' ')
                                 message = message.delete('　')
+                                message = message.slice!(0, 3)
                                 new = List.create({
                                     group: 'TODO',
                                     content: message
@@ -150,44 +150,44 @@ post '/list' do
                                     response_message = "買い物\n"
                                     List.all.each do |list|
                                         if list.group == '買い物'
-                                            response_message << list.content + "\n"
+                                            response_message << '・' + list.content + "\n"
                                         end
                                     end
                                     response_message << "\nTODO\n"
                                     List.all.each do |list|
                                         if list.group == 'TODO'
-                                            response_message << list.content + "\n"
+                                            response_message << '・' + list.content + "\n"
                                         end
                                     end
                                 end
                             elsif message.include?('消す')
-                                message = message.delete('消す')
                                 message = message.delete(' ')
                                 message = message.delete('　')
+                                message = message.slice!(0, 2)
                                 List.find_by(content: message).destroy
                                 response_message = "買い物\n"
                                 List.all.each do |list|
                                         if list.group == '買い物'
-                                            response_message << list.content + "\n"
+                                            response_message << '・' + list.content + "\n"
                                         end
                                     end
                                     response_message << "\nTODO\n"
                                 List.all.each do |list|
                                     if list.group == 'TODO'
-                                        response_message << list.content + "\n"
+                                        response_message << '・' + list.content + "\n"
                                     end
                                 end
                             elsif message == "確認"
                                 response_message = "買い物\n"
                                 List.all.each do |list|
                                         if list.group == '買い物'
-                                            response_message << list.content + "\n"
+                                            response_message << '・' + list.content + "\n"
                                         end
                                     end
                                     response_message << "\nTODO\n"
                                 List.all.each do |list|
                                     if list.group == 'TODO'
-                                        response_message << list.content + "\n"
+                                        response_message << '・' + list.content + "\n"
                                     end
                                 end
                             elsif message == "リセット"
@@ -196,13 +196,13 @@ post '/list' do
                                 response_message << "買い物\n"
                                 List.all.each do |list|
                                     if list.group == '買い物'
-                                        response_message << list.content + "\n"
+                                        response_message << '・' + list.content + "\n"
                                     end
                                 end
                                 response_message << "\nTODO\n"
                                 List.all.each do |list|
                                     if list.group == 'TODO'
-                                        response_message << list.content + "\n"
+                                        response_message << '・' + list.content + "\n"
                                     end
                                 end
                             else

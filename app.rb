@@ -193,11 +193,12 @@ post '/list' do
                             elsif message == "リセット"
                                 response_message = "リストをリセットします\n"
                                 List.all.destroy_all
+                                response_message << "買い物\n"
                                 List.all.each do |list|
-                                        if list.group == '買い物'
-                                            response_message << list.content + "\n"
-                                        end
+                                    if list.group == '買い物'
+                                        response_message << list.content + "\n"
                                     end
+                                end
                                 response_message << "\nTODO\n"
                                 List.all.each do |list|
                                     if list.group == 'TODO'

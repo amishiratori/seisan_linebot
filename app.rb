@@ -119,7 +119,7 @@ post '/list' do
                             if message.include?('買う')
                                 message = message.delete(' ')
                                 message = message.delete('　')
-                                message.slice(0, 2)
+                                message = message.slice(2, message.length)
                                 new =List.create({
                                     group: '買い物',
                                     content: message
@@ -141,7 +141,7 @@ post '/list' do
                             elsif message.include?('タスク')
                                 message = message.delete(' ')
                                 message = message.delete('　')
-                                message.slice(0, 3)
+                                message = message.slice(3, message.length)
                                 new = List.create({
                                     group: 'TODO',
                                     content: message
@@ -163,7 +163,7 @@ post '/list' do
                             elsif message.include?('消す')
                                 message = message.delete(' ')
                                 message = message.delete('　')
-                                message.slice(0, 2)
+                                message = message.slice(2, message.length)
                                 List.find_by(content: message).destroy
                                 response_message = "買い物\n"
                                 List.all.each do |list|

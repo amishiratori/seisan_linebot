@@ -6,11 +6,15 @@ require 'cgi'
 require 'json'
 require 'line/bot'
 
-def client 
-    @client ||= Line::Bot::Client.new { |config|
-        config.channel_secret = ENV['LINE_CHANNEL_SECRET']
-        config.channel_token = ENV['LINE_CHANNEL_TOKEN']
-    }
+before do 
+    if request.path_info == '/sei_san'
+        def client
+            @client ||= Line::Bot::Client.new { |config|
+                config.channel_secret = ENV['LINE_CHANNEL_SECRET_SEISAN']
+                config.channel_token = ENV['LINE_CHANNEL_TOKEN_SEISAN']
+            }
+        end
+    end
 end
 
 post '/sei_san' do
@@ -66,7 +70,7 @@ post '/sei_san' do
                             user_id = event['source']['userId']
                             
                             url = "https://api.line.me/v2/bot/profile/#{user_id}"
-                            res = RestClient.get url, { :Authorization => "Bearer #{ENV['LINE_CHANNEL_TOKEN']}" }
+                            res = RestClient.get url, { :Authorization => "Bearer #{ENV['LINE_CHANNEL_TOKEN_SEISAN']}" }
                             returned_json = JSON.parse(res.body)
                             user_name =  returned_json["displayName"]
                             

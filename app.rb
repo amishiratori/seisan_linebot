@@ -14,6 +14,13 @@ before do
                 config.channel_token = ENV['LINE_CHANNEL_TOKEN_SEISAN']
             }
         end
+    elsif request.path_info == '/list'
+        def client
+            @client ||= Line::Bot::Client.new { |config|
+                config.channel_secret = ENV['LINE_CHANNEL_SECRET_LIST']
+                config.channel_token = ENV['LINE_CHANNEL_TOKEN_LIST']
+            }
+        end
     end
 end
 
@@ -77,6 +84,121 @@ post '/sei_san' do
                             user = User.find_by(name: user_name)
                             user.update_column(:paid_total, user.paid_total + (paid / 2))
                             response_message = user_name + 'は現在' + user.paid_total.to_s + '円立て替えています'
+                        end
+                        message = {
+                              type: 'text',
+                              text: response_message
+                            }
+                            
+                        client.reply_message(event['replyToken'], message)
+                end
+        end
+    end
+end
+
+post '/list' do
+    body = request.body.read
+    signature = request.env['HTTP_X_LINE_SIGNATURE']
+    unless client.validate_signature(body, signature)
+      error 400 do 'Bad Request' end
+    end
+    events = client.parse_events_from(body)
+    events.each do |event|
+        case event
+            when Line::Bot::Event::Message
+                case event.type
+                    when Line::Bot::Event::MessageType::Text
+                        message = event.message['text']
+                        user_id = event['source']['userId']
+                        url = "https://api.line.me/v2/bot/profile/#{user_id}"
+                        res = RestClient.get url, { :Authorization => "Bearer #{ENV['LINE_CHANNEL_TOKEN_LIST']}" }
+                        returned_json = JSON.parse(res.body)
+                        user_name =  returned_json["displayName"]
+                        user = User.find_by(name: user_name)
+                        unless user.nil?
+                            if message.include?('買い物')
+                                message = message.delete('買い物')
+                                message = message.delete(' ')
+                                message = message.delete('　')
+                                new =List.create({
+                                    group: '買い物',
+                                    content: message
+                                })
+                                if new.persisted?
+                                    response_message = "買い物\n"
+                                    List.all.each do |list|
+                                        if list.group == '買い物'
+                                            response_message << list.content + "\n"
+                                        end
+                                    end
+                                    response_message << "\nTODO\n"
+                                    List.all.each do |list|
+                                        if list.group == 'TODO'
+                                            response_message << list.content + "\n"
+                                        end
+                                    end
+                                end
+                            elsif message.include?('TODO')
+                                message = message.delete('TODO')
+                                message = message.delete(' ')
+                                message = message.delete('　')
+                                new = List.create({
+                                    group: 'TODO',
+                                    content: message
+                                })
+                                if new.persisted?
+                                    response_message = "買い物\n"
+                                    List.all.each do |list|
+                                        if list.group == '買い物'
+                                            response_message << list.content + "\n"
+                                        end
+                                    end
+                                    response_message << "\nTODO\n"
+                                    List.all.each do |list|
+                                        if list.group == 'TODO'
+                                            response_message << list.content + "\n"
+                                        end
+                                    end
+                                end
+                            elsif message.include?('DONE')
+                                message = message.delete('DONE')
+                                message = message.delete(' ')
+                                message = message.delete('　')
+                                List.find_by(content: message).destroy
+                                response_message = "買い物\n"
+                                List.all.each do |list|
+                                        if list.group == '買い物'
+                                            response_message << list.content + "\n"
+                                        end
+                                    end
+                                    response_message << "\nTODO\n"
+                                List.all.each do |list|
+                                    if list.group == 'TODO'
+                                        response_message << list.content + "\n"
+                                    end
+                                end
+                            elsif message == "確認"
+                                response_message = "買い物\n"
+                                List.all.each do |list|
+                                        if list.group == '買い物'
+                                            response_message << list.content + "\n"
+                                        end
+                                    end
+                                    response_message << "\nTODO\n"
+                                List.all.each do |list|
+                                    if list.group == 'TODO'
+                                        response_message << list.content + "\n"
+                                    end
+                                end
+                            else
+                                response_message = "買い物〇〇\n"
+                                response_message << "TODO〇〇\n"
+                                response_message << "DONE〇〇\n"
+                                response_message << "確認 \n\n"
+                                response_message << 'のどれかを送ってね！'
+                            end
+                        else 
+                            response_message = 'not an allowed user'
                         end
                         message = {
                               type: 'text',

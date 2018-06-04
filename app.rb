@@ -206,11 +206,11 @@ post '/list' do
                                     end
                                 end
                             else
-                                response_message = "買い物〇〇\n"
-                                response_message << "TODO〇〇\n"
-                                response_message << "DONE〇〇\n"
+                                response_message = "買う〇〇\n"
+                                response_message << "タスク〇〇\n"
+                                response_message << "消す〇〇\n"
                                 response_message << "確認 \n"
-                                response_message << "消す\n\n"
+                                response_message << "リセット\n\n"
                                 response_message << 'のどれかを送ってね！'
                             end
                         else 

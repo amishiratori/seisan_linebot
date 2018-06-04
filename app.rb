@@ -13,7 +13,7 @@ def client
     }
 end
 
-post '/callback' do
+post '/sei_san' do
     body = request.body.read
     signature = request.env['HTTP_X_LINE_SIGNATURE']
     unless client.validate_signature(body, signature)
